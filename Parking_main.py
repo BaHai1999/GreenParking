@@ -27,7 +27,7 @@ def listBoundingRect(img):
             img = cv2.rectangle(img, (x, y), (x+w, y+h), (0, 255, 0), 1)
             rs = non_maximum_suppresstion(rs, [x, y, w, h], threshold=0.3)
             # rs.append([x, y, w, h])
-    # img = cv2.drawContours(img, contours, -1, (255, 0, 0), 1)
+    img = cv2.drawContours(img, contours, -1, (255, 0, 0), 1)
     # plt.imshow(img), plt.show()
     return rs
 
@@ -72,7 +72,7 @@ def OCR(img, box):
     chars = []
     for contour in contours:
         x, y, w, h = cv2.boundingRect(contour)
-        if(h <= box.shape[0]):
+        if(box.shape[0]/6 <= h <= box.shape[0]):
             if (1.5 < h/w < 5):
                 non_maximum_suppresstion(chars, [x, y, w, h])
     chars = sort(chars)
@@ -83,16 +83,16 @@ def OCR(img, box):
         x_predict = cv2.resize(x_predict, (30, 60))
         x_predict = np.reshape(x_predict, 30*60)
         X_predict.append(x_predict)
-        # box = cv2.rectangle(box, (x, y), (x+w, y+h), (255, 0, 0), 1)
-        # char1 = crop(mask, x, y, w, h)
-        # cv2.imshow('.', char1), cv2.waitKey(0)
+        box = cv2.rectangle(box, (x, y), (x+w, y+h), (255, 0, 0), 1)
+        char1 = crop(mask, x, y, w, h)
+        cv2.imshow('.', char1), cv2.waitKey(0)
     X_predict = np.array(X_predict)
     y_predict = clf.predict(X_predict)
-    # plt.imshow(box), plt.show()
+    plt.imshow(box), plt.show()
     return y_predict
 
 if __name__ == '__main__':
-    img =  cv2.imread('dataset/5.jpg')
+    img =  cv2.imread('dataset/25.jpg')
     img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
     output = listBoundingRect(img.copy())
     # print(output)
@@ -101,6 +101,7 @@ if __name__ == '__main__':
         box = img[y:y + h, x:x + w, :].copy()
         y_predict = OCR(img, box)
         text = ''
+        print(y_predict)
         for y_output in y_predict:
             if(y_output > 9):
                 text = text + chr(y_output)
