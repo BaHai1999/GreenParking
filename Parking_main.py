@@ -61,7 +61,7 @@ def sort(chars):
                     chars[j], chars[i] = chars[i], chars[j]
     return chars
 
-def detect_character(img, box):
+def OCR(img, box):
     _box = cv2.cvtColor(box, cv2.COLOR_RGB2GRAY)
     # _box = cv2.GaussianBlur(_box, (5,5), 0)
     ret, mask = cv2.threshold(_box, 0, 255, cv2.THRESH_BINARY+cv2.THRESH_OTSU)
@@ -83,23 +83,23 @@ def detect_character(img, box):
         x_predict = cv2.resize(x_predict, (30, 60))
         x_predict = np.reshape(x_predict, 30*60)
         X_predict.append(x_predict)
-        box = cv2.rectangle(box, (x, y), (x+w, y+h), (255, 0, 0), 1)
-        char1 = crop(mask, x, y, w, h)
-        cv2.imshow('.', char1), cv2.waitKey(0)
+        # box = cv2.rectangle(box, (x, y), (x+w, y+h), (255, 0, 0), 1)
+        # char1 = crop(mask, x, y, w, h)
+        # cv2.imshow('.', char1), cv2.waitKey(0)
     X_predict = np.array(X_predict)
     y_predict = clf.predict(X_predict)
-    plt.imshow(box), plt.show()
+    # plt.imshow(box), plt.show()
     return y_predict
 
 if __name__ == '__main__':
-    img =  cv2.imread('dataset/9.jpg')
+    img =  cv2.imread('dataset/5.jpg')
     img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
     output = listBoundingRect(img.copy())
     # print(output)
     for x, y, w, h in output:
         cv2.rectangle(img, (x, y), (x+w, y+h), (255, 0, 0), 2)
         box = img[y:y + h, x:x + w, :].copy()
-        y_predict = detect_character(img, box)
+        y_predict = OCR(img, box)
         text = ''
         for y_output in y_predict:
             if(y_output > 9):
